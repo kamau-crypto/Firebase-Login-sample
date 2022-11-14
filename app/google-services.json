@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "95853517749",
+    "project_id": "chama-login",
+    "storage_bucket": "chama-login.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:95853517749:android:f0679acb6e4fe518c2d7fc",
+        "android_client_info": {
+          "package_name": "com.example.android.firebaseui_login_sample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "95853517749-e8033a94nj2feqfrpeapl5g0bdesmolf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.android.firebaseui_login_sample",
+            "certificate_hash": "9cfe1a806a3a5ac8a113c776304b3865d56889ab"
+          }
+        },
+        {
+          "client_id": "95853517749-kdsrruu23s3k03m3fo5choao75vtldtb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYl29OWwv7J-RcUA44WFrrDZ2ChV39sxw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "95853517749-kdsrruu23s3k03m3fo5choao75vtldtb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

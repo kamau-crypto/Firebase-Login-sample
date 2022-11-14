@@ -26,8 +26,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import com.example.android.firebaseui_login_sample.databinding.FragmentMainBinding
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -48,11 +46,6 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false)
-
-        // TODO Remove the two lines below once observeAuthenticationState is implemented.
-        binding.welcomeText.text = viewModel.getFactToDisplay(requireContext())
-        binding.authButton.text = getString(R.string.login_btn)
-
         return binding.root
     }
 
@@ -60,16 +53,23 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeAuthenticationState()
 
-        binding.authButton.setOnClickListener {
-            // TODO call launchSignInFlow when authButton is clicked
+        binding.authButton.setOnClickListener {launchSignInFlow()
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        // TODO Listen to the result of the sign in process by filter for when
-        //  SIGN_IN_REQUEST_CODE is passed back. Start by having log statements to know
-        //  whether the user has signed in successfully
+        if(requestCode == SIGN_IN_RESULT_CODE){
+         val response = IdpResponse.fromResultIntent(data)
+         if(resultCode == Activity.RESULT_OK){
+             //
+             //The user has successfully signed in
+             Log.i(TAG, "Successfully signed in user ${FirebaseAuth.getInstance().currentUser?.displayName}!")
+         }else{
+             //The user sign in failed. Or the user cancelled the sign-in flow
+             Log.i(TAG, "Sign  in unsuccessful ${response?.error?.errorCode}")
+         }
+        }
     }
 
     /**
@@ -79,17 +79,30 @@ class MainFragment : Fragment() {
      */
     private fun observeAuthenticationState() {
         val factToDisplay = viewModel.getFactToDisplay(requireContext())
+        viewModel.authenticationState.observe(viewLifecycleOwner,  { authenticationState->
+            when(authenticationState){
+                LoginViewModel.AuthenticationState.AUTHENTICATED->{
+                    binding.welcomeText.text = getFactWithPersonalization(factToDisplay)
 
-        // TODO Use the authenticationState variable from LoginViewModel to update the UI
-        //  accordingly.
-        //
-        //  TODO If there is a logged-in user, authButton should display Logout. If the
-        //   user is logged in, you can customize the welcome message by utilizing
-        //   getFactWithPersonalition(). I
+                    binding.authButton.text = getString(R.string.logout_button_text)
+                    binding.authButton.setOnClickListener{
+                        AuthUI.getInstance().signOut(requireContext())
+                    }
+                }
+                else ->{
+                    binding.welcomeText.text = factToDisplay
 
-        // TODO If there is no logged in user, authButton should display Login and launch the sign
-        //  in screen when clicked. There should also be no personalization of the message
-        //  displayed.
+                    binding.authButton.text= getString(R.string.login_button_text)
+                    binding.authButton.setOnClickListener{
+                        launchSignInFlow()
+                    }
+                }
+
+
+
+
+            }
+        })
     }
 
 
@@ -104,7 +117,20 @@ class MainFragment : Fragment() {
     }
 
     private fun launchSignInFlow() {
-        // TODO Complete this function by allowing users to register and sign in with
-        //  either their email address or Google account.
+        //
+        //Add an array of comma separated login providers such as Facebook, and google
+        val providers = arrayListOf(
+            AuthUI.IdpConfig.EmailBuilder().build(),
+            AuthUI.IdpConfig.GoogleBuilder().build()
+        )
+        //
+        //Create and launch the sign-in intent.
+        startActivityForResult(
+            AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .build(),
+            SIGN_IN_RESULT_CODE
+        )
     }
 }
